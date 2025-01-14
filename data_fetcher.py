@@ -93,3 +93,4 @@ def fetch_adrs(ticker, start_date, end_date):
     except Exception as e:
         print(f"Ocorreu um erro ao buscar os dados para {ticker}: {e}")
         return pd.DataFrame()  # Retorna tabela vazia em caso de erro
+
