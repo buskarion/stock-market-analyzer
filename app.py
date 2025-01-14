@@ -1,5 +1,5 @@
 import streamlit as st
-from data_fetcher import fetch_futures
+from data_fetcher import fetch_futures, fetch_adrs
 
 # Título e descrição da aplicação
 st.title("Análise de Variáveis da Madrugada - Mini Índice")
@@ -18,13 +18,21 @@ end_date = st.sidebar.date_input("Data final")
 if st.sidebar.button("Executar Análise"):
     st.write(f"Analisando dados de {start_date} até {end_date}...")
 
-    # Coletar dados do S&P 500
+    # Coleta de dados
     sp500_data = fetch_futures("ES=F", start_date, end_date)
     dowjones_data = fetch_futures("YM=F", start_date, end_date)
+    pbr_data = fetch_adrs("PBR", start_date, end_date)
+    vale_data = fetch_adrs("VALE", start_date, end_date)
 
-    # Exibir os dados coletados na interface
+    # Exibição dos dados
     st.subheader("Futuros do S&P 500")
     st.write(sp500_data)
 
     st.subheader("Futuros do Dow Jones")
     st.write(dowjones_data)
+
+    st.subheader("ADRs - Petrobras (PBR)")
+    st.write(pbr_data)
+
+    st.subheader("ADRs - Vale (VALE)")
+    st.write(vale_data)
