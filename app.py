@@ -1,4 +1,5 @@
 import streamlit as st
+import pandas as pd
 from data_fetcher import fetch_futures, fetch_adrs
 
 # Título e descrição da aplicação
@@ -23,16 +24,21 @@ if st.sidebar.button("Executar Análise"):
     dowjones_data = fetch_futures("YM=F", start_date, end_date)
     pbr_data = fetch_adrs("PBR", start_date, end_date)
     vale_data = fetch_adrs("VALE", start_date, end_date)
+    brent_data = fetch_futures("BZ=F", start_date, end_date)
+    usd_brl_data = fetch_futures("USDBRL=X", start_date, end_date)
 
-    # Exibição dos dados
-    st.subheader("Futuros do S&P 500")
-    st.write(sp500_data)
+    # Consolidar em uma única tabela
+    consolidated_data = pd.concat(
+        [
+            sp500_data.assign(Variável="S&P 500"),
+            dowjones_data.assign(Variável="Dow Jones"),
+            pbr_data.assign(Variável="Petrobras (PBR)"),
+            vale_data.assign(Variável="Vale (VALE)"),
+            brent_data.assign(Variável="Petróleo Brent"),
+            usd_brl_data.assign(Variável="USD/BRL"),
+        ]
+    )
 
-    st.subheader("Futuros do Dow Jones")
-    st.write(dowjones_data)
-
-    st.subheader("ADRs - Petrobras (PBR)")
-    st.write(pbr_data)
-
-    st.subheader("ADRs - Vale (VALE)")
-    st.write(vale_data)
+    # Exibir a tabela consolidada
+    st.subheader("Análise Consolidada")
+    st.write(consolidated_data)
