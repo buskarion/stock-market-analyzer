@@ -94,3 +94,33 @@ def fetch_adrs(ticker, start_date, end_date):
         print(f"Ocorreu um erro ao buscar os dados para {ticker}: {e}")
         return pd.DataFrame()  # Retorna tabela vazia em caso de erro
 
+def calculate_probability(sp500, dowjones, adrs, commodities, forex):
+    """
+    Calcula a probabilidade de alta com base nos pesos das variáveis.
+    """
+    try:
+        # Pesos atribuídos às variáveis
+        weights = {
+            'sp500': 0.4,
+            'dowjones': 0.4,
+            'adrs': 0.3,
+            'commodities': 0.2,
+            'forex': 0.1
+        }
+
+        # Calcular a probabilidade de alta
+        probability = (
+            (sp500 * weights['sp500']) +
+            (dowjones * weights['dowjones']) +
+            (adrs * weights['adrs']) +
+            (commodities * weights['commodities']) +
+            (forex * weights['forex'])
+        )
+
+        # Garantir que o resultado esteja no intervalo de 0 a 100%
+        return max(0, min(100, probability))
+
+    except Exception as e:
+        print(f"Erro ao calcular a probabilidade de alta: {e}")
+        return None
+
