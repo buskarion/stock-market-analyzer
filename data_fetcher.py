@@ -1,12 +1,18 @@
 import yfinance as yf
 import pandas as pd
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 def fetch_futures(ticker, start_date, end_date, hour_cutoff="08:50"):
     """
     Coleta os dados de contratos futuros para o ticker fornecido.
     Filtra apenas o valor mais próximo das 8h50 de cada dia.
     """
+    if isinstance(start_date, str):
+        start_date = datetime.strptime(start_date, "%Y-%m-%d")
+
+    if isinstance(end_date, str):
+        end_date = datetime.strptime(end_date, "%Y-%m-%d")
+
     start_date = start_date.strftime("%Y-%m-%d")
     end_date = end_date.strftime("%Y-%m-%d")
 
@@ -105,8 +111,18 @@ def calculate_probability(sp500, dowjones, adrs, commodities, forex):
             'dowjones': 0.4,
             'adrs': 0.3,
             'commodities': 0.2,
-            'forex': 0.1
+            'forex': 0.1        
         }
+
+        """
+        weights = {
+            'sp500': 0.35,
+            'dowjones': 0.35,
+            'adrs': 0.25,
+            'commodities': -0.15,
+            'forex': -0.20
+        }
+        """
 
         # Calcular a probabilidade de alta
         probability = (
@@ -124,3 +140,33 @@ def calculate_probability(sp500, dowjones, adrs, commodities, forex):
         print(f"Erro ao calcular a probabilidade de alta: {e}")
         return None
 
+# Lista de tickers que estamos utilizando
+tickers = {
+    "sp500": "^GSPC",
+    "dowjones": "^DJI",
+    "adrs": "PBR",  # Petrobras como exemplo
+    "commodities": "BZ=F",  # Brent
+    "forex": "USDBRL=X"  # Dólar/Real
+}
+
+# Definir o período de análise
+start_date = "2025-01-01"  # Ajuste conforme necessário
+end_date = "2025-02-15"
+
+# Testar se os dados estão sendo baixados corretamente
+def diagnose_data():
+    for key, ticker in tickers.items():
+        df = fetch_futures(ticker, start_date, end_date)
+        
+        print(f"\n🔍 {key.upper()} - {ticker}")
+        print(df.head())  # Exibir as primeiras linhas
+        print(f"📊 Estatísticas:\n{df.describe()}")
+        print(f"🛑 Valores Nulos: {df.isnull().sum()}\n")
+        
+        # Se houver valores nulos ou anômalos, alertamos
+        if df.isnull().sum().sum() > 0:
+            print(f"⚠️ ALERTA: Há valores nulos no {key}. Verifique se os dados estão corretos.")
+
+# Rodar diagnóstico
+if __name__ == "__main__":
+    diagnose_data()
